@@ -978,6 +978,9 @@ class TopK:
 def top_keys(scores: torch.Tensor, lengths: torch.Tensor, k: int) -> torch.Tensor:
     """Pick the best `k` columns of each row within its length, as packed keys.
 
+    On triton-ascend with CANN 9.2.1 a call over more than 512 rows races and returns wrong keys (#23).
+    No setting here avoids it - call it there on slices of at most 512 rows and concatenate the keys.
+
     Args:
         scores: Scores [R, N] fp32.
         lengths: Columns each row holds [R] int32, at most N.
